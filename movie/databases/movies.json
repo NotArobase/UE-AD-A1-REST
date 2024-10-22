@@ -47,12 +47,6 @@
             "rating": 1.2,
             "director": "Someone",
             "id": "xxx"
-        },
-        {
-            "director": "Christopher Nolan",
-            "id": "9",
-            "rating": 10.0,
-            "title": "Oppenheimer"
         }
     ]
 }
