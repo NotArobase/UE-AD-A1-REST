@@ -1,0 +1,275 @@
+openapi: 3.0.0
+info:
+  title: User API
+  description: API to manage user bookings and retrieve movie information
+  version: 1.0.0
+servers:
+  - url: http://localhost:3203
+    description: Local server for User Service
+
+paths:
+  /:
+    get:
+      summary: Home endpoint
+      responses:
+        '200':
+          description: Welcome message
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    last_active:
+                      type: integer
+
+  /users/{userid}/bookings:
+    get:
+      summary: Get all bookings for a specific user
+      parameters:
+        - name: userid
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all bookings for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userid:
+                    type: string
+                  dates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                        movies:
+                          type: array
+                          items:
+                            type: string
+        '404':
+          description: User or bookings not found
+
+    post:
+      summary: Add a booking for a specific user
+      parameters:
+        - name: userid
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                movieid:
+                  type: string
+                  description: The ID of the movie to book
+                date:
+                  type: string
+                  description: The date for the booking
+      responses:
+        '200':
+          description: Booking successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userid:
+                    type: string
+                  dates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                        movies:
+                          type: array
+                          items:
+                            type: string
+        '400':
+          description: Invalid input
+        '404':
+          description: Movie or showtime not found
+        '409':
+          description: Booking already exists
+        '500':
+          description: Internal server error
+
+  /users/{userid}/bookings/{date}:
+    get:
+      summary: Get bookings for a user on a specific date
+      parameters:
+        - name: userid
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+        - name: date
+          in: path
+          required: true
+          description: Date of the booking in YYYYMMDD format
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking for the specified user and date
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userid:
+                    type: string
+                  date:
+                    type: string
+                  movies:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: No bookings found for this date
+
+  /users/{userid}/movies:
+    get:
+      summary: Get movie details for all bookings of a user
+      parameters:
+        - name: userid
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Movie details for all bookings of the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    movieid:
+                      type: string
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    rating:
+                      type: number
+        '404':
+          description: No bookings or movies found for the user
+
+  /users/{userid}/bookingsbytitle:
+    post:
+      summary: Add a booking for a user by movie title
+      parameters:
+        - name: userid
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The title of the movie to book
+                date:
+                  type: string
+                  description: The date for the booking
+      responses:
+        '200':
+          description: Booking successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userid:
+                    type: string
+                  dates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                        movies:
+                          type: array
+                          items:
+                            type: string
+        '400':
+          description: Invalid input
+        '404':
+          description: Movie or showtime not found
+        '409':
+          description: Booking already exists
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    Booking:
+      type: object
+      properties:
+        userid:
+          type: string
+        dates:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+              movies:
+                type: array
+                items:
+                  type: string
+    Movie:
+      type: object
+      properties:
+        movieid:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        rating:
+          type: number
